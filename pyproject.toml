@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "checker-chain"
+version = "0.0.1"
+description = ""
+authors = ["CheckerChain"]
+readme = "README.md"
+packages = [
+    { include = "checker-chain", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+communex = "^0.1.36.5"
+typer = "^0.9.0"
+uvicorn = "^0.29.0"
+keylimiter = "^0.1.5"
+pydantic-settings = "^2.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+# Define CLI entry point
+cli = "checker-chain.cli:main"
