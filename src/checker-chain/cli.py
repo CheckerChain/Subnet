@@ -7,6 +7,7 @@ from communex.compat.key import classic_load_key  # type: ignore
 
 from .validator._config import ValidatorSettings
 from .validator.validator import get_subnet_netuid, TextValidator
+from .sqlite_utils import create_db
 
 app = typer.Typer()
 
@@ -21,13 +22,14 @@ def serve(
     keypair = classic_load_key(commune_key)  # type: ignore
     settings = ValidatorSettings()  # type: ignore
     c_client = CommuneClient(get_node_url())
-    subnet_uid = get_subnet_netuid(c_client, "your-subnet-name")
+    subnet_uid = get_subnet_netuid(c_client, "checker-chain-subnet")
     validator = TextValidator(
         keypair,
         subnet_uid,
         c_client,
         call_timeout=call_timeout,
     )
+    create_db();
     validator.validation_loop(settings)
 
 

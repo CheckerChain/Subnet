@@ -23,7 +23,7 @@ To run the validator, just call the module in which you are executing
 `validator.validation_loop()`. For example:
 
 ```sh
-python3 -m checker-chain.cli <name-of-your-com-key>
+python -m checker-chain.cli <name-of-your-com-key>
 ```
 
 [communex]: https://github.com/agicommies/communex

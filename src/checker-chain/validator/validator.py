@@ -23,6 +23,7 @@ import asyncio
 import concurrent.futures
 import re
 import time
+import requests
 from functools import partial
 
 from communex.client import CommuneClient
@@ -32,7 +33,9 @@ from communex.types import Ss58Address
 from substrateinterface import Keypair  # type: ignore
 
 from ._config import ValidatorSettings
-from ..utils import log
+from ..utils import get_checker_chain_unmined_product_ids, log
+from ..sqlite_utils import get_a_product, get_predictions_for_product, get_products,add_prediction,add_product, update_product_status
+
 
 IP_REGEX = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+")
 
@@ -240,7 +243,7 @@ class TextValidator(Module):
             miner_answer = None
         return miner_answer
 
-    def _score_miner(self, miner_answer: str | None) -> float:
+    def _score_miner(self, product_trust_score:float, miner_answer: float | None) -> float:
         """
         Score the generated answer against the validator's own answer.
 
@@ -256,17 +259,33 @@ class TextValidator(Module):
             return 0
 
         return 0
+    
+    def score_miners(self, syntia_netuid: int, settings: ValidatorSettings):
+        product = get_a_product(check_chain_review_done=True, mining_done=True)
+        miners = get_predictions_for_product(product["_id"])
+        score_dict: dict[int, float] = {}
+        for miner in miners:
+            score = self._score_miner(product['trust_score'], miner['miner_id'])
+            score_dict[miner['miner_id']] = score
+        if not score_dict:
+            log("No miner managed to give a valid answer")
+            return None
+
+        # the blockchain call to set the weights
+        _ = set_weights(settings, score_dict, self.netuid, self.client, self.key)
+        
 
     def get_miner_prompt(self) -> str:
         """
-        Generate a prompt for the miner modules.
-
+        Get one unmined product from our sqlite db
+        
         Returns:
             The generated prompt for the miner modules.
         """
-
+        product = get_a_product(mining_done=False)
+        update_product_status(product["_id"], None, True, None);
         # Implement your custom prompt generation logic here
-        return "foo"
+        return product["_id"];
 
     async def validate_step(
         self, syntia_netuid: int, settings: ValidatorSettings
@@ -299,7 +318,11 @@ class TextValidator(Module):
 
         score_dict: dict[int, float] = {}
 
-        miner_prompt = self.get_miner_prompt()
+        product = get_a_product(mining_done=False)
+        update_product_status(product["_id"], mining_done=True);
+        # miner_prompt = self.get_miner_prompt()
+        miner_prompt = product["_id"]
+        
         get_miner_prediction = partial(self._get_miner_prediction, miner_prompt)
 
         log(f"Selected the following miners: {modules_info.keys()}")
@@ -314,18 +337,19 @@ class TextValidator(Module):
                 log(f"Skipping miner {uid} that didn't answer")
                 continue
 
-            score = self._score_miner(miner_answer)
-            time.sleep(0.5)
-            # score has to be lower or eq to 1, as one is the best score, you can implement your custom logic
-            assert score <= 1
-            score_dict[uid] = score
+            add_prediction(product_id=product["_id"], miner_id=uid, prediction=miner_answer);
+            # score = self._score_miner(miner_answer)
+            # time.sleep(0.5)
+            # # score has to be lower or eq to 1, as one is the best score, you can implement your custom logic
+            # assert score <= 1
+            # score_dict[uid] = score
 
-        if not score_dict:
-            log("No miner managed to give a valid answer")
-            return None
+        # if not score_dict:
+        #     log("No miner managed to give a valid answer")
+        #     return None
 
         # the blockchain call to set the weights
-        _ = set_weights(settings, score_dict, self.netuid, self.client, self.key)
+        # _ = set_weights(settings, score_dict, self.netuid, self.client, self.key)
 
     def validation_loop(self, settings: ValidatorSettings) -> None:
         """
@@ -337,10 +361,15 @@ class TextValidator(Module):
 
         while True:
             start_time = time.time()
-            _ = asyncio.run(self.validate_step(self.netuid, settings))
-
-            elapsed = time.time() - start_time
-            if elapsed < settings.iteration_interval:
-                sleep_time = settings.iteration_interval - elapsed
-                log(f"Sleeping for {sleep_time}")
-                time.sleep(sleep_time)
+            unmined = get_a_product(mining_done=False);
+            mined_and_ready_to_score = get_a_product(mining_done=True, check_chain_review_done=True)
+            if unmined is not None:
+                _ = asyncio.run(self.validate_step(self.netuid, settings))
+            elif mined_and_ready_to_score is not None:
+                _ = self.score_miners(self.netuid, settings)
+            else:
+                elapsed = time.time() - start_time
+                if elapsed < settings.iteration_interval:
+                    sleep_time = settings.iteration_interval - elapsed
+                    log(f"Sleeping for {sleep_time}")
+                    time.sleep(sleep_time)

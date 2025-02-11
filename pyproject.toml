@@ -9,7 +9,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-
+requests = "^2.32.3"
 communex = "^0.1.36.5"
 typer = "^0.9.0"
 uvicorn = "^0.29.0"
