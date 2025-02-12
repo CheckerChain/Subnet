@@ -1,6 +1,6 @@
 # CheckerChain Subnet
 
-Built on top of **[Commune Subnet Template]**
+Built on top of **[Bittensor Subnet Template]** & **[Commune Subnet Template]**
 
 ## Dependencies
 
@@ -25,7 +25,7 @@ To run the validator, just call the module in which you are executing
 ```sh
 python3 -m checker-chain.cli <name-of-your-com-key>
 ```
-
+[Bittensor Subnet Template]: https://github.com/opentensor/bittensor-subnet-template/blob/main/docs/running_on_staging.md
 [communex]: https://github.com/agicommies/communex
 [commune-ai]: https://communeai.org/
 [Commune Subnet Template]: https://github.com/renlabs-dev/commune-subnet-template
