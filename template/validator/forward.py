@@ -25,6 +25,10 @@ from template.validator.reward import get_rewards
 from template.utils.uids import get_random_uids
 from neurons.validator import Validator
 
+# Bittensor Validator Template:
+from template.utils.checker_chain import get_and_update_checker_chain_product_list
+from template.utils.sqlite_utils import add_prediction, get_a_product, update_product_status
+
 
 async def forward(self: Validator):
     """
@@ -41,8 +45,8 @@ async def forward(self: Validator):
     miner_uids = get_random_uids(self, k=self.config.neuron.sample_size)
     # The dendrite client queries the network.
     # define product id to get scores for
-
-    product_id = 1234
+    product = get_a_product(mining_done=False)
+    product_id = product["_id"]
     responses = await self.dendrite(
         # Send the query to selected miner axons in the network.
         axons=[self.metagraph.axons[uid] for uid in miner_uids],
@@ -55,14 +59,3 @@ async def forward(self: Validator):
 
     # Log the results for monitoring purposes.
     bt.logging.info(f"Received responses: {responses}")
-
-    # Get the actual trust score for the product.
-    actual_trust = 100
-    # TODO(developer): Define how the validator scores responses.
-    # Adjust the scores based on responses from miners.
-    rewards = get_rewards(self, actual_trust=actual_trust, responses=responses)
-
-    bt.logging.info(f"Scored responses: {rewards}")
-    # Update the scores based on the rewards. You may want to define your own update_scores function for custom behavior.
-    self.update_scores(rewards, miner_uids)
-    time.sleep(5)

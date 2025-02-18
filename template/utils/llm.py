@@ -1,17 +1,5 @@
-import requests
 import openai
-
-
-def fetch_product_data(product_id):
-    """Fetch product data from the API using the product ID."""
-    url = f"https://backend.checkerchain.com/api/v1/products/{product_id}"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        return response.json().get("data", [{}])[0]  # Get the first product item
-    else:
-        print("Error fetching product data:", response.status_code, response.text)
-        return None
+from template.utils.checker_chain import fetch_product_data
 
 
 def get_trust_score(product_id):

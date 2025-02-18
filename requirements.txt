@@ -6,3 +6,5 @@ torch>=2
 numpy>=1
 setuptools>=68
 openai>=1.61.1
+requests>=2
+bittensor>=9

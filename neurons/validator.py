@@ -18,6 +18,8 @@
 # DEALINGS IN THE SOFTWARE.
 
 
+import asyncio
+from functools import partial
 import time
 
 # Bittensor
@@ -26,8 +28,9 @@ import bittensor as bt
 # import base validator class which takes care of most of the boilerplate
 from template.base.validator import BaseValidatorNeuron
 
-# Bittensor Validator Template:
+from template.utils.sqlite_utils import get_a_product, get_predictions_for_product
 from template.validator import forward
+from template.validator.reward import get_rewards
 
 
 class Validator(BaseValidatorNeuron):
@@ -47,17 +50,32 @@ class Validator(BaseValidatorNeuron):
 
         # TODO(developer): Anything specific to your use case you can do here
 
+    async def score_loop(self):
+        """
+        Scoring loop ran alongside forward from concurrent_forward
+        """
+        product = get_a_product(
+            mining_done=True, check_chain_review_done=True, rewards_distributed=False)
+        # Get the actual trust score for the product.
+        actual_trust = product["trustScore"]
+
+        miner_responses = get_predictions_for_product(product["_id"])
+        miner_uids = [response['miner_uid'] for response in miner_responses]
+        responses = [response['prediction'] for response in miner_responses]
+
+        rewards = get_rewards(
+            self, actual_trust=actual_trust, responses=responses)
+
+        bt.logging.info(f"Scored responses: {rewards}")
+        # Update the scores based on the rewards. You may want to define your own update_scores function for custom behavior.
+        self.update_scores(rewards, miner_uids)
+        time.sleep(5)
+
     async def forward(self):
         """
-        Validator forward pass. Consists of:
-        - Generating the query
-        - Querying the miners
-        - Getting the responses
-        - Rewarding the miners
-        - Updating the scores
+        Validator forward pass, querying the miners and scoring answers.
         """
-        # TODO(developer): Rewrite this function based on your protocol definition.
-        return await forward(self)
+        return forward(self)
 
 
 # The main function parses the configuration and runs the validator.
