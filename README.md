@@ -1,16 +1,15 @@
 <div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
-
 ---
 
 ## CheckerChain Subnet: Decentralized Trustless Review Consensus Mechanism With RLHF <!-- omit in toc -->
+---
 
 [Discord](https://discord.gg/bittensor) • [Network](https://checkerchain.com/) • [Research](https://docs.checkerchain.com/whitepaper/checkerchain-whitepaper-v2.0)
 </div>
 
 CheckerChain subnet operates as a decentralized AI-powered prediction layer, continuously refining review scores through RLHF machine learning. It is a next-gen AI-powered crypto review platform built on blockchain using trustless review consensus mechanism (tRCM).
----
+
 - [Quickstarter template](#quickstarter-template)
 - [Introduction](#introduction)
   - [Example](#example)
