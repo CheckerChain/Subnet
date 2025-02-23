@@ -1,16 +1,15 @@
 <div align="center">
 
-# **Bittensor Subnet Template** <!-- omit in toc -->
-[![Discord Chat](https://img.shields.io/discord/308323056592486420.svg)](https://discord.gg/bittensor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
 
 ---
 
-## The Incentivized Internet <!-- omit in toc -->
+## CheckerChain Subnet: Decentralized Trustless Review Consensus Mechanism With RLHF <!-- omit in toc -->
 
-[Discord](https://discord.gg/bittensor) • [Network](https://taostats.io/) • [Research](https://bittensor.com/whitepaper)
+[Discord](https://discord.gg/bittensor) • [Network](https://checkerchain.com/) • [Research](https://docs.checkerchain.com/whitepaper/checkerchain-whitepaper-v2.0)
 </div>
 
+CheckerChain subnet operates as a decentralized AI-powered prediction layer, continuously refining review scores through RLHF machine learning. It is a next-gen AI-powered crypto review platform built on blockchain using trustless review consensus mechanism (tRCM).
 ---
 - [Quickstarter template](#quickstarter-template)
 - [Introduction](#introduction)
