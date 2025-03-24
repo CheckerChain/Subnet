@@ -1,4 +1,3 @@
-
 """
 Functions:
     set_weights: Blockchain call to set weights for miners based on their scores.
@@ -13,12 +12,13 @@ Constants:
 
 import re
 
-from communesdk.client import CommuneClient
-from communesdk.keypair import Keypair
+from communex.client import CommuneClient
+from communex.key import Keypair
 
 from ._config import ValidatorSettings
 
 IP_REGEX = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+")
+
 
 def set_weights(
     settings: ValidatorSettings,
@@ -49,7 +49,7 @@ def set_weights(
     # Calculate the sum of all inverted scores
     scores = sum(score_dict.values())
 
-    # process the scores into weights of type dict[int, int] 
+    # process the scores into weights of type dict[int, int]
     # Iterate over the items in the score_dict
     for uid, score in score_dict.items():
         # Calculate the normalized weight as an integer
@@ -57,7 +57,6 @@ def set_weights(
 
         # Add the weighted score to the new dictionary
         weighted_scores[uid] = weight
-
 
     # filter out 0 weights
     weighted_scores = {k: v for k, v in weighted_scores.items() if v != 0}
@@ -97,7 +96,9 @@ def extract_address(string: str):
     return re.search(IP_REGEX, string)
 
 
-def get_subnet_netuid(client: CommuneClient, subnet_name: str = "replace-with-your-subnet-name"):
+def get_subnet_netuid(
+    client: CommuneClient, subnet_name: str = "replace-with-your-subnet-name"
+):
     """
     Retrieve the network UID of the subnet.
 
@@ -130,7 +131,9 @@ def get_ip_port(modules_addresses: dict[int, str]):
         A dictionary mapping module IDs to their IP and port information.
     """
 
-    filtered_addr = {id: extract_address(addr) for id, addr in modules_addresses.items()}
+    filtered_addr = {
+        id: extract_address(addr) for id, addr in modules_addresses.items()
+    }
     ip_port = {
         id: x.group(0).split(":") for id, x in filtered_addr.items() if x is not None
     }

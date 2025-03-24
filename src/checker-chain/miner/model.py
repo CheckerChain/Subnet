@@ -4,10 +4,10 @@ from typing import List
 from communex.module import Module, endpoint
 from communex.key import generate_keypair
 from keylimiter import TokenBucketLimiter
-
 from .llm import generate_review_score
 from .util import get_overall_score
-from utils import fetch_product_data
+from ..utils import fetch_product_data
+
 
 class Miner(Module):
     """
@@ -52,7 +52,7 @@ class Miner(Module):
                 print(f"Error processing result: {e}")
                 predictions.append(None)
         print(f"Answering: `{prompt}` with model `{model}`")
-        return HTTPResponse(content={"answer":predictions})
+        return HTTPResponse(content={"answer": predictions})
 
 
 if __name__ == "__main__":
